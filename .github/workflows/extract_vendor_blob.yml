@@ -1,0 +1,34 @@
+name: Extract Vendor Blob
+
+on:
+  push:
+    branches:
+      - main  # 触发工作流的分支，可以根据需要修改
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'  # 安装 Python 环境
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y zip unzip  # 安装解压工具
+        pip install dumpyara  # 安装 Dumpyara 工具
+
+    - name: Download MIUI firmware
+      run: |
+        wget https://xiaomirom.com/download/redmi-k30-ultra-cezanne-stable-V14.0.5.0.SJNCNXM/#china-recovery -O firmware.zip  # 下载 MIUI 固件包
+        unzip firmware.zip -d firmware  # 解压固件包
+
+    - name: Extract Vendor Blob
+      run: |
+        bash device/xiaomi/cezanne/extract-files.sh firmware  # 从解压后的固件目录中提取 Vendor Blob
