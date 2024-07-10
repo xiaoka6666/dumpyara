@@ -3,7 +3,7 @@ name: Extract Vendor Blob
 on:
   push:
     branches:
-      - mastar  # 触发工作流的分支，可以根据需要修改
+      - master  # 触发工作流的分支，可以根据需要修改
 
 jobs:
   build:
