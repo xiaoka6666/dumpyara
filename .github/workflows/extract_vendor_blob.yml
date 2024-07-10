@@ -26,7 +26,7 @@ jobs:
 
     - name: Download MIUI firmware
       run: |
-        wget https://xiaomirom.com/download/redmi-k30-ultra-cezanne-stable-V14.0.5.0.SJNCNXM/#china-recovery -O firmware.zip  # 下载 MIUI 固件包
+        wget https://bn.d.miui.com/V14.0.5.0.SJNCNXM/miui_CEZANNE_V14.0.5.0.SJNCNXM_7ff0af0ef7_12.0.zip -O firmware.zip  # 下载 MIUI 固件包
         unzip firmware.zip -d firmware  # 解压固件包
 
     - name: Extract Vendor Blob
