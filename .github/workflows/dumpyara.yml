@@ -6,7 +6,7 @@ on:
       OTA_LINK:
         description: 'OTA link or file path'
         required: true
-        default: 
+        default: 'https://bn.d.miui.com/V14.0.5.0.SJNCNXM/miui_CEZANNE_V14.0.5.0.SJNCNXM_7ff0af0ef7_12.0.zip'  # 填入默认的 OTA 链接或文件路径
 
 jobs:
   dumpyara:
