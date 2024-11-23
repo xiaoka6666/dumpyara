@@ -2,6 +2,11 @@ name: Dumpyara Automation
 
 on:
   workflow_dispatch:  # 手动触发工作流
+    inputs:
+      OTA_LINK:
+        description: 'OTA link or file path'
+        required: true
+        default: '<default_path_or_link>'
 
 jobs:
   dumpyara:
@@ -29,11 +34,11 @@ jobs:
           cd dumpyara
           bash setup.sh
 
-      # Run the dumpyara script
+      # Run the dumpyara script with the manually provided OTA link
       - name: Run dumpyara
         env:
           TOKEN: ${{ secrets.TOKEN }}  # GitHub token stored in the Secrets
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}  # Telegram bot token stored in the Secrets
         run: |
           cd dumpyara
-          bash dumpyara.sh "<OTAlink_or_OTAfiel_path>" ${{ secrets.TOKEN }}
+          bash dumpyara.sh ${{ github.event.inputs.OTA_LINK }} ${{ secrets.TOKEN }}
