@@ -1,32 +1,42 @@
-name: DumpYara Telegram Feed
+name: Dumpyara Automation
 
 on:
-  workflow_dispatch:  # 允许手动触发
   push:
     branches:
       - main
 
 jobs:
   dumpyara:
-    runs-on: ubuntu-latest  # 选择 Ubuntu 作为运行环境
-
+    runs-on: ubuntu-latest
+    
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
+      # Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.8'
+      # Set up Git
+      - name: Set up Git
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
 
-    - name: Install Dependencies
-      run: |
-        # 如果需要的依赖在 requirements.txt 中，执行安装
-        pip install -r requirements.txt
+      # Clone the dumpyara repository
+      - name: Clone dumpyara repository
+        run: |
+          git clone https://github.com/xiaoka6666/dumpyara.git
+          cd dumpyara
 
-    - name: Run DumpYara Script
-      run: |
-        bash dumpyara.sh "$DUMPYARA_OTA_LINK" "$DUMPYARA_GITHUB_TOKEN"
-      env:
-        DUMPYARA_OTA_LINK: ${{ secrets.DUMPYARA_OTA_LINK }}  # 通过 GitHub Secrets 管理 OTA link
-        DUMPYARA_GITHUB_TOKEN: ${{ secrets.DUMPYARA_GITHUB_TOKEN }}  # 通过 GitHub Secrets 管理 GitHub token
+      # Set up required dependencies
+      - name: Install dependencies
+        run: |
+          cd dumpyara
+          bash setup.sh
+
+      # Run the dumpyara script
+      - name: Run dumpyara
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub token stored in the Secrets
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}  # Telegram bot token stored in the Secrets
+        run: |
+          cd dumpyara
+          bash dumpyara.sh "<OTAlink_or_OTAfiel_path>" ${{ secrets.GITHUB_TOKEN }}
