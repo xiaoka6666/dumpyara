@@ -34,4 +34,4 @@ jobs:
           GIT_OAUTH_TOKEN: ${{ secrets.GIT_OAUTH_TOKEN }}  # GitHub token stored in the Secrets
         run: |
           cd dumpyara
-          bash dumpyara.sh ${{ github.event.inputs.OTA_LINK }}
+          bash dumpyara.sh ${{ github.event.inputs.OTA_LINK }} ${{ secrets.GIT_OAUTH_TOKEN }}
