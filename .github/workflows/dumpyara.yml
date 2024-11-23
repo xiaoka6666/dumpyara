@@ -4,34 +4,51 @@ on:
   workflow_dispatch:  # 手动触发工作流
     inputs:
       OTA_LINK:
-        description: 'OTA link or file path'
+        description: 'OTA 链接或文件路径'
         required: true
-        default: 'https://bn.d.miui.com/V14.0.5.0.SJNCNXM/miui_CEZANNE_V14.0.5.0.SJNCNXM_7ff0af0ef7_12.0.zip'  # 填入默认的 OTA 链接或文件路径
+        default: ''  # 填入默认的 OTA 链接或文件路径
 
 jobs:
   dumpyara:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # 使用 Ubuntu 最新版本作为运行环境
     
     steps:
-      # Checkout the repository
+      # 检出代码库
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Clone the dumpyara repository
+      # 克隆 dumpyara 仓库
       - name: Clone dumpyara repository
         run: |
           git clone https://github.com/xiaoka6666/dumpyara.git
 
-      # Set up required dependencies
+      # 安装所需的依赖
       - name: Install dependencies
         run: |
           cd dumpyara
           bash setup.sh
 
-      # Run the dumpyara script with the manually provided OTA link
+      # 运行 dumpyara 脚本，使用手动提供的 OTA 链接
       - name: Run dumpyara
-        env:
-          GIT_OAUTH_TOKEN: ${{ secrets.GIT_OAUTH_TOKEN }}  # GitHub token stored in the Secrets
         run: |
           cd dumpyara
-          bash dumpyara.sh ${{ github.event.inputs.OTA_LINK }} ${{ secrets.GIT_OAUTH_TOKEN }}
+          bash dumpyara.sh ${{ github.event.inputs.OTA_LINK }}
+
+      # 获取 "working" 目录中的文件夹名称作为新分支名
+      - name: Get new branch name
+        id: get_branch_name
+        run: |
+          # 假设 "working" 目录中包含且只有一个文件夹
+          NEW_BRANCH=$(ls -d "$PROJECT_DIR/working/"*/)
+          NEW_BRANCH=$(basename "$NEW_BRANCH")
+          echo "NEW_BRANCH_NAME=$NEW_BRANCH" >> $GITHUB_ENV  # 设置环境变量，供后续步骤使用
+
+      # 创建新分支并上传 "working" 目录的内容
+      - name: Create a new branch and push working directory
+        run: |
+          cd "$PROJECT_DIR"
+          git checkout -b ${{ env.NEW_BRANCH_NAME }}  # 使用 "working" 目录中的文件夹名创建新分支
+          cp -r "$PROJECT_DIR/working/${{ env.NEW_BRANCH_NAME }}"/* .  # 将该文件夹的内容复制到仓库根目录
+          git add .  # 将更改添加到 Git 暂存区
+          git commit -m "上传 working 目录内容"  # 提交更改
+          git push origin ${{ env.NEW_BRANCH_NAME }}  # 推送新分支到 GitHub
