@@ -17,12 +17,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # Set up Git
-      - name: Set up Git
-        run: |
-          git config --global user.name 'xiaoka6666'
-          git config --global user.email '115566356+xiaoka6666@users.noreply.github.com'
-
       # Clone the dumpyara repository
       - name: Clone dumpyara repository
         run: |
