@@ -20,8 +20,8 @@ jobs:
       # Set up Git
       - name: Set up Git
         run: |
-          git config --global user.name 'github-actions'
-          git config --global user.email 'github-actions@github.com'
+          git config --global user.name 'xiaoka6666'
+          git config --global user.email '115566356+xiaoka6666@users.noreply.github.com'
 
       # Clone the dumpyara repository
       - name: Clone dumpyara repository
