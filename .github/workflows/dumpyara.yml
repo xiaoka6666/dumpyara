@@ -30,9 +30,11 @@ jobs:
 
       # 运行 dumpyara 脚本，使用手动提供的 OTA 链接
       - name: Run dumpyara
+        env:
+          GIT_OAUTH_TOKEN: ${{ secrets.GIT_OAUTH_TOKEN }}  # GitHub token stored in the Secrets
         run: |
           cd dumpyara
-          bash dumpyara.sh ${{ github.event.inputs.OTA_LINK }}
+          bash dumpyara.sh ${{ github.event.inputs.OTA_LINK }} ${{ secrets.GIT_OAUTH_TOKEN }}
 
       # 获取 "working" 目录中的文件夹名称作为新分支名
       - name: Get new branch name
