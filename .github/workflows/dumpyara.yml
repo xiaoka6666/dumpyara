@@ -31,8 +31,8 @@ jobs:
       # Run the dumpyara script with the manually provided OTA link
       - name: Run dumpyara
         env:
-          TOKEN: ${{ secrets.TOKEN }}  # GitHub token stored in the Secrets
+          GIT_OAUTH_TOKEN: ${{ secrets.GIT_OAUTH_TOKEN }}  # GitHub token stored in the Secrets
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}  # Telegram bot token stored in the Secrets
         run: |
           cd dumpyara
-          bash dumpyara.sh ${{ github.event.inputs.OTA_LINK }} ${{ secrets.TOKEN }}
+          bash dumpyara.sh ${{ github.event.inputs.OTA_LINK }} ${{ secrets.GIT_OAUTH_TOKEN }}
