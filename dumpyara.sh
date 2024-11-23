@@ -365,10 +365,10 @@ if [[ -n $GIT_OAUTH_TOKEN ]]; then
     curl --silent --fail "https://raw.githubusercontent.com/$ORG/$repo/$branch/all_files.txt" 2> /dev/null && echo "Firmware already dumped!" && exit 1
     git init
     if [[ -z "$(git config --get user.email)" ]]; then
-        git config user.email AndroidDumps@github.com
+        git config user.email 115566356+xiaoka6666@users.noreply.github.com
     fi
     if [[ -z "$(git config --get user.name)" ]]; then
-        git config user.name AndroidDumps
+        git config user.name xiaoka6666
     fi
     curl -s -X POST -H "Authorization: token ${GIT_OAUTH_TOKEN}" -d '{ "name": "'"$repo"'" }' "https://api.github.com/orgs/${ORG}/repos" #create new repo
     curl -s -X PUT -H "Authorization: token ${GIT_OAUTH_TOKEN}" -H "Accept: application/vnd.github.mercy-preview+json" -d '{ "names": ["'"$manufacturer"'","'"$platform"'","'"$top_codename"'"]}' "https://api.github.com/repos/${ORG}/${repo}/topics"
