@@ -1,9 +1,7 @@
 name: Dumpyara Automation
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:  # 手动触发工作流
 
 jobs:
   dumpyara:
