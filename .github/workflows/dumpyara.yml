@@ -32,8 +32,8 @@ jobs:
       # Run the dumpyara script
       - name: Run dumpyara
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub token stored in the Secrets
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}  # Telegram bot token stored in the Secrets
+          TOKEN: ${{ secrets.TOKEN }}  # GitHub token stored in the Secrets
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}  # Telegram bot token stored in the Secrets
         run: |
           cd dumpyara
-          bash dumpyara.sh "<OTAlink_or_OTAfiel_path>" ${{ secrets.GITHUB_TOKEN }}
+          bash dumpyara.sh "<OTAlink_or_OTAfiel_path>" ${{ secrets.TOKEN }}
