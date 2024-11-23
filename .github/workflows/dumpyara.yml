@@ -6,7 +6,7 @@ on:
       OTA_LINK:
         description: 'OTA link or file path'
         required: true
-        default: '<default_path_or_link>'
+        default: 
 
 jobs:
   dumpyara:
