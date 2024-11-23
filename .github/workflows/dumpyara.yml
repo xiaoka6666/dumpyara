@@ -22,7 +22,6 @@ jobs:
       - name: Clone dumpyara repository
         run: |
           git clone https://github.com/xiaoka6666/dumpyara.git
-          cd dumpyara
 
       # Set up required dependencies
       - name: Install dependencies
