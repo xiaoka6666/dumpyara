@@ -370,9 +370,9 @@ if [[ -n $GIT_OAUTH_TOKEN ]]; then
     if [[ -z "$(git config --get user.name)" ]]; then
         git config user.name xiaoka6666
     fi
-    curl -s -X POST -H "Authorization: token ${GIT_OAUTH_TOKEN}" -d '{ "name": "'"$repo"'" }' "https://api.github.com/orgs/${ORG}/repos" #create new repo
-    curl -s -X PUT -H "Authorization: token ${GIT_OAUTH_TOKEN}" -H "Accept: application/vnd.github.mercy-preview+json" -d '{ "names": ["'"$manufacturer"'","'"$platform"'","'"$top_codename"'"]}' "https://api.github.com/repos/${ORG}/${repo}/topics"
-    git remote add origin https://github.com/$ORG/"${repo,,}".git
+    curl -s -X POST -H "Authorization: Bearer ${GIT_OAUTH_TOKEN}" -d '{ "name": "'"$repo"'" }' "https://gitlab.com/api/v4/projects" #create new repo
+    curl -s -X PUT -H "Authorization: Bearer ${GIT_OAUTH_TOKEN}" -H "Accept: application/vnd.github.mercy-preview+json" -d '{ "names": ["'"$manufacturer"'","'"$platform"'","'"$top_codename"'"]}' "https://gitlab.com/api/v4/projects/${ORG}%2F${repo}/tag_list"
+    git remote add origin https://gitlab.com/$ORG/${repo,,}.git
     git checkout -b "$branch"
     find . -size +97M -printf '%P\n' -o -name "*sensetime*" -printf '%P\n' -o -name "*.lic" -printf '%P\n' >| .gitignore
     git add --all
