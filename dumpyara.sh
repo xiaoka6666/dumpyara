@@ -361,18 +361,18 @@ chmod -R u+rwX ./* #ensure final permissions
 find "$PROJECT_DIR"/working/"${UNZIP_DIR}" -type f -printf '%P\n' | sort | grep -v ".git/" > "$PROJECT_DIR"/working/"${UNZIP_DIR}"/all_files.txt
 
 if [[ -n $GIT_OAUTH_TOKEN ]]; then
-    GITPUSH=(git push https://"$GIT_OAUTH_TOKEN"@github.com/$ORG/"${repo,,}".git "$branch")
-    curl --silent --fail "https://raw.githubusercontent.com/$ORG/$repo/$branch/all_files.txt" 2> /dev/null && echo "Firmware already dumped!" && exit 1
+    GITPUSH=(git push https://gitlab-ci-token:"$GIT_OAUTH_TOKEN"@gitlab.com/$ORG/"${repo,,}".git "$branch")
+    curl --silent --fail "" 2> /dev/null && echo "Firmware already dumped!" && exit 1
     git init
     if [[ -z "$(git config --get user.email)" ]]; then
-        git config user.email 115566356+xiaoka6666@users.noreply.github.com
+        git config user.email 115566356+xiaoka6666@users.noreply.gitlab.com
     fi
     if [[ -z "$(git config --get user.name)" ]]; then
         git config user.name xiaoka6666
     fi
-    curl -s -X POST -H "Authorization: Bearer ${GIT_OAUTH_TOKEN}" -d '{ "name": "'"$repo"'" }' "https://gitlab.com/api/v4/projects" #create new repo
-    curl -s -X PUT -H "Authorization: Bearer ${GIT_OAUTH_TOKEN}" -H "Accept: application/vnd.github.mercy-preview+json" -d '{ "names": ["'"$manufacturer"'","'"$platform"'","'"$top_codename"'"]}' "https://gitlab.com/api/v4/projects/${ORG}%2F${repo}/tag_list"
-    git remote add origin https://gitlab.com/$ORG/${repo,,}.git
+    curl -s -X POST -H "Authorization: Bearer ${GIT_OAUTH_TOKEN}" -d '{ "name": "'"$repo"'" }' "https://gitlab.com/api/v4/groups/${ORG}/projects" # create new repo in GitLab
+    curl -s -X PUT -H "Authorization: Bearer ${GIT_OAUTH_TOKEN}" -d '{ "names": ["'"$manufacturer"'","'"$platform"'","'"$top_codename"'"]}' "https://gitlab.com/api/v4/projects/${ORG}%2F${repo}/topics" #set project topics
+    git remote add origin https://gitlab.com/$ORG/"${repo,,}".git
     git checkout -b "$branch"
     find . -size +97M -printf '%P\n' -o -name "*sensetime*" -printf '%P\n' -o -name "*.lic" -printf '%P\n' >| .gitignore
     git add --all
