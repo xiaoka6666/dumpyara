@@ -24,13 +24,13 @@ fi
 # Activate virtual environment
 source .venv/bin/activate
 
-# GitHub token
+# GitLab token
 if [[ -n $2 ]]; then
     GIT_OAUTH_TOKEN=$2
-elif [[ -f ".githubtoken" ]]; then
-    GIT_OAUTH_TOKEN=$(< .githubtoken)
+elif [[ -f ".gitlabtoken" ]]; then
+    GIT_OAUTH_TOKEN=$(< .gitlabtoken)
 else
-    echo "GitHub token not found. Dumping just locally..."
+    echo "GitLab token not found. Dumping just locally..."
 fi
 
 # download or copy from local?
