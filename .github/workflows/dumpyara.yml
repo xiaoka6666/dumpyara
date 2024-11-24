@@ -35,28 +35,3 @@ jobs:
         run: |
           cd dumpyara
           bash dumpyara.sh ${{ github.event.inputs.OTA_LINK }} ${{ secrets.GIT_OAUTH_TOKEN }}
-
-      # 获取 "working" 目录中的文件夹名称作为新分支名
-      - name: Get new branch name
-        id: get_branch_name
-        run: |
-          # 获取 "working" 目录中第一个子文件夹的名称
-          NEW_BRANCH=$(ls -d "/home/runner/work/dumpyara/dumpyara/dumpyara/working/"*/ | head -n 1)  # 获取第一个文件夹名
-          NEW_BRANCH=$(basename "$NEW_BRANCH")  # 只保留文件夹名称
-          echo "NEW_BRANCH_NAME=$NEW_BRANCH" >> $GITHUB_ENV  # 设置环境变量，供后续步骤使用
-
-      # 调试输出 "working" 目录的内容，确认路径和文件夹名称
-      - name: List working directory content
-        run: |
-          echo "Listing contents of working directory:"
-          ls -l "/home/runner/work/dumpyara/dumpyara/dumpyara/working/"
-
-      # 创建新分支并上传 "working" 目录的内容
-      - name: Create a new branch and push working directory
-        run: |
-          cd "/home/runner/work/dumpyara/dumpyara/dumpyara/"  # 切换到正确的仓库目录
-          git checkout -b ${{ env.NEW_BRANCH_NAME }}  # 使用 "working" 目录中的文件夹名创建新分支
-          echo "Copying files from working/${{ env.NEW_BRANCH_NAME }} to root"
-          git add .  # 将更改添加到 Git 暂存区
-          git commit -m "上传 working 目录内容"  # 提交更改
-          git push origin ${{ env.NEW_BRANCH_NAME }}  # 推送新分支到 GitHub
