@@ -365,7 +365,7 @@ if [[ -n $GIT_OAUTH_TOKEN ]]; then
     curl --silent --fail "" 2> /dev/null && echo "Firmware already dumped!" && exit 1
     git init
     if [[ -z "$(git config --get user.email)" ]]; then
-        git config user.email 115566356+xiaoka6666@users.noreply.gitlab.com
+        git config user.email 22097791+xiaoka6666@users.noreply.gitlab.com
     fi
     if [[ -z "$(git config --get user.name)" ]]; then
         git config user.name xiaoka6666
