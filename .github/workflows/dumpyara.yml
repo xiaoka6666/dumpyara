@@ -17,15 +17,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 克隆 dumpyara 仓库
-      - name: Clone dumpyara repository
-        run: |
-          git clone https://github.com/xiaoka6666/dumpyara.git
-
       # 安装所需的依赖
       - name: Install dependencies
         run: |
-          cd dumpyara
           bash setup.sh
 
       # 运行 dumpyara 脚本，使用手动提供的 OTA 链接
@@ -33,5 +27,4 @@ jobs:
         env:
           GIT_OAUTH_TOKEN: ${{ secrets.GIT_OAUTH_TOKEN }}  # GitHub token stored in the Secrets
         run: |
-          cd dumpyara
           bash dumpyara.sh ${{ github.event.inputs.OTA_LINK }} ${{ secrets.GIT_OAUTH_TOKEN }}
