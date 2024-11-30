@@ -395,14 +395,26 @@ if [[ -n $GIT_OAUTH_TOKEN ]]; then
     git remote add origin https://gitlab.com/$ORG/"${repo,,}".git
 
     # 检查并创建分支
-    git checkout "$branch" || git checkout -b "$branch"
+    if git show-ref --verify --quiet "refs/heads/$branch"; then
+        echo "Branch $branch already exists, checking out."
+        git checkout "$branch"
+    else
+        echo "Branch $branch does not exist, creating a new branch."
+        git checkout -b "$branch"
+    fi
 
     # 生成 .gitignore，排除大文件和特定文件
     find . -size +97M -printf '%P\n' -o -name "*sensetime*" -printf '%P\n' -o -name "*.lic" -printf '%P\n' >| .gitignore
 
-    # 添加并提交文件
+    # 添加所有文件到 Git
     git add --all
-    git commit -asm "Add ${description}"
+
+    # 检查是否有改动，若有改动则提交
+    if git diff --exit-code; then
+        echo "No changes to commit."
+    else
+        git commit -asm "Add ${description}"
+    fi
 
     # 删除 HEAD 引用并重置某些目录
     git update-ref -d HEAD
@@ -433,7 +445,6 @@ if [[ -n $GIT_OAUTH_TOKEN ]]; then
 
     git add product/
     git commit -asm "Add product for ${description}" && "${GITPUSH[@]}"
-
 else
     # 如果没有 GitLab OAuth Token，完成本地操作
     echo "Dump done locally."
