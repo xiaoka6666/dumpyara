@@ -355,11 +355,7 @@ if python3 -c "import aospdtgen"; then
     fi
 fi
 
-#!/bin/bash
-
-# 设置文件权限和所有权
-chown "$(whoami)" ./* -R
-chmod -R u+rwX ./*  # 确保文件权限正确
+# copy file names
 
 # 查找所有文件并保存至 all_files.txt
 find "$PROJECT_DIR"/working/"${UNZIP_DIR}" -type f -printf '%P\n' | sort | grep -v ".git/" > "$PROJECT_DIR"/working/"${UNZIP_DIR}"/all_files.txt
