@@ -355,47 +355,91 @@ if python3 -c "import aospdtgen"; then
     fi
 fi
 
-# copy file names
+#!/bin/bash
+
+# 设置文件权限和所有权
 chown "$(whoami)" ./* -R
-chmod -R u+rwX ./* #ensure final permissions
+chmod -R u+rwX ./*  # 确保文件权限正确
+
+# 查找所有文件并保存至 all_files.txt
 find "$PROJECT_DIR"/working/"${UNZIP_DIR}" -type f -printf '%P\n' | sort | grep -v ".git/" > "$PROJECT_DIR"/working/"${UNZIP_DIR}"/all_files.txt
 
+# 如果 OAuth Token 存在，继续推送到 GitLab
 if [[ -n $GIT_OAUTH_TOKEN ]]; then
     GITPUSH=(git push https://gitlab-ci-token:"$GIT_OAUTH_TOKEN"@gitlab.com/$ORG/"${repo,,}".git "$branch")
+
+    # 检查固件是否已经上传
     curl --silent --fail "" 2> /dev/null && echo "Firmware already dumped!" && exit 1
+
+    # 初始化 Git 仓库
     git init
+
+    # 设置 Git 配置：用户名和邮箱
     if [[ -z "$(git config --get user.email)" ]]; then
         git config user.email 22097791+xiaoka6666@users.noreply.gitlab.com
     fi
     if [[ -z "$(git config --get user.name)" ]]; then
         git config user.name xiaoka6666
     fi
-    curl -s -X POST -H "Authorization: Bearer ${GIT_OAUTH_TOKEN}" -d '{ "name": "'"$repo"'" }' "https://gitlab.com/api/v4/groups/${ORG}/projects" # create new repo in GitLab
-    curl -s -X PUT -H "Authorization: Bearer ${GIT_OAUTH_TOKEN}" -d '{ "names": ["'"$manufacturer"'","'"$platform"'","'"$top_codename"'"]}' "https://gitlab.com/api/v4/projects/${ORG}%2F${repo}/topics" #set project topics
+
+    # 创建 GitLab 项目
+    echo "Creating GitLab project..."
+    response=$(curl -s -w "%{http_code}" -o /tmp/gitlab_response.json -X POST -H "Authorization: Bearer ${GIT_OAUTH_TOKEN}" -d '{ "name": "'"$repo"'" }' "https://gitlab.com/api/v4/groups/${ORG}/projects")
+
+    # 检查创建项目的响应
+    if [[ "$response" != "201" ]]; then
+        echo "Error creating project in GitLab. Response: $(cat /tmp/gitlab_response.json)"
+        exit 1
+    fi
+
+    # 设置项目标签
+    curl -s -X PUT -H "Authorization: Bearer ${GIT_OAUTH_TOKEN}" -d '{ "names": ["'"$manufacturer"'","'"$platform"'","'"$top_codename"'"]}' "https://gitlab.com/api/v4/projects/${ORG}%2F${repo}/topics"
+
+    # 添加远程仓库
     git remote add origin https://gitlab.com/$ORG/"${repo,,}".git
-    git checkout -b "$branch"
+
+    # 检查并创建分支
+    git checkout "$branch" || git checkout -b "$branch"
+
+    # 生成 .gitignore，排除大文件和特定文件
     find . -size +97M -printf '%P\n' -o -name "*sensetime*" -printf '%P\n' -o -name "*.lic" -printf '%P\n' >| .gitignore
+
+    # 添加并提交文件
     git add --all
     git commit -asm "Add ${description}"
+
+    # 删除 HEAD 引用并重置某些目录
     git update-ref -d HEAD
     git reset system/ vendor/ product/
+
+    # 再次创建并提交更改
     git checkout -b "$branch"
     git commit -asm "Add extras for ${description}" && "${GITPUSH[@]}"
+
+    # 按目录提交和推送
     git add vendor/
     git commit -asm "Add vendor for ${description}" && "${GITPUSH[@]}"
+
     git add system/system/app/ || git add system/app/
     git commit -asm "Add system app for ${description}" && "${GITPUSH[@]}"
+
     git add system/system/priv-app/ || git add system/priv-app/
     git commit -asm "Add system priv-app for ${description}" && "${GITPUSH[@]}"
+
     git add system/
     git commit -asm "Add system for ${description}" && "${GITPUSH[@]}"
+
     git add product/app/
     git commit -asm "Add product app for ${description}" && "${GITPUSH[@]}"
+
     git add product/priv-app/
     git commit -asm "Add product priv-app for ${description}" && "${GITPUSH[@]}"
+
     git add product/
     git commit -asm "Add product for ${description}" && "${GITPUSH[@]}"
+
 else
+    # 如果没有 GitLab OAuth Token，完成本地操作
     echo "Dump done locally."
     exit 1
 fi
