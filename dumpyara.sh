@@ -355,23 +355,23 @@ if python3 -c "import aospdtgen"; then
     fi
 fi
 
-# copy file names
+# 复制文件名
 chown "$(whoami)" ./* -R
-chmod -R u+rwX ./* #ensure final permissions
+chmod -R u+rwX ./* #确保最终权限
 find "$PROJECT_DIR"/working/"${UNZIP_DIR}" -type f -printf '%P\n' | sort | grep -v ".git/" > "$PROJECT_DIR"/working/"${UNZIP_DIR}"/all_files.txt
 
 if [[ -n $GIT_OAUTH_TOKEN ]]; then
-    GITPUSH=(git push https://gitlab-ci-token:"$GIT_OAUTH_TOKEN"@gitlab.com/$ORG/"${repo,,}".git "$branch")
-    curl --silent --fail "https://gitlab.com/api/v4/projects/$ORG%2F${repo,,}/repository/files/path%2Fto%2Ffirmware%2Ffile/raw" 2> /dev/null && echo "Firmware already dumped!" && exit 1
+    GITPUSH=(git push https://"$GIT_OAUTH_TOKEN"@gitlab.com/$ORG/"${repo,,}".git "$branch")
+    curl --silent --fail "" 2> /dev/null && echo "Firmware already dumped!" && exit 1
     git init
     if [[ -z "$(git config --get user.email)" ]]; then
-        git config user.email 22097791+xiaoka6666@users.noreply.gitlab.com
+        git config user.email AndroidDumps@gitlab.com
     fi
     if [[ -z "$(git config --get user.name)" ]]; then
-        git config user.name xiaoka6666
+        git config user.name AndroidDumps
     fi
-    curl -s -X POST -H "Authorization: Bearer ${GIT_OAUTH_TOKEN}" -d '{ "name": "'"$repo"'" }' "https://gitlab.com/api/v4/groups/${ORG}/projects" # create new repo in GitLab
-    curl -s -X PUT -H "Authorization: Bearer ${GIT_OAUTH_TOKEN}" -d '{ "names": ["'"$manufacturer"'","'"$platform"'","'"$top_codename"'"]}' "https://gitlab.com/api/v4/projects/${ORG}%2F${repo}/topics" #set project topics
+    curl -s -X POST -H "Authorization: Bearer ${GIT_OAUTH_TOKEN}" -d '{ "name": "'"$repo"'" }' "https://gitlab.com/api/v4/projects?namespace=$ORG" # 在 GitLab 上创建新仓库
+    curl -s -X PUT -H "Authorization: Bearer ${GIT_OAUTH_TOKEN}" -d '{ "names": ["'"$manufacturer"'","'"$platform"'","'"$top_codename"'"]}' "https://gitlab.com/api/v4/projects/$ORG/$repo/topics" # 设置项目话题
     git remote add origin https://gitlab.com/$ORG/"${repo,,}".git
     git checkout -b "$branch"
     find . -size +97M -printf '%P\n' -o -name "*sensetime*" -printf '%P\n' -o -name "*.lic" -printf '%P\n' >| .gitignore
