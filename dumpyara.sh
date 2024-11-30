@@ -24,13 +24,13 @@ fi
 # Activate virtual environment
 source .venv/bin/activate
 
-# GitLab token
+# GitHub token
 if [[ -n $2 ]]; then
     GIT_OAUTH_TOKEN=$2
-elif [[ -f ".gitlabtoken" ]]; then
-    GIT_OAUTH_TOKEN=$(< .gitlabtoken)
+elif [[ -f ".githubtoken" ]]; then
+    GIT_OAUTH_TOKEN=$(< .githubtoken)
 else
-    echo "GitLab token not found. Dumping just locally..."
+    echo "GitHub token not found. Dumping just locally..."
 fi
 
 # download or copy from local?
@@ -52,7 +52,7 @@ else
     [[ -e "$URL" ]] || { echo "Invalid Input" && exit 1; }
 fi
 
-ORG=xiaoka6666 #your GitLab org name
+ORG=AndroidDumps #your GitHub org name
 FILE=$(echo ${URL##*/} | inline-detox)
 EXTENSION=$(echo ${URL##*.} | inline-detox)
 UNZIP_DIR=${FILE/.$EXTENSION/}
@@ -355,24 +355,24 @@ if python3 -c "import aospdtgen"; then
     fi
 fi
 
-# 复制文件名
+# copy file names
 chown "$(whoami)" ./* -R
-chmod -R u+rwX ./* #确保最终权限
+chmod -R u+rwX ./* #ensure final permissions
 find "$PROJECT_DIR"/working/"${UNZIP_DIR}" -type f -printf '%P\n' | sort | grep -v ".git/" > "$PROJECT_DIR"/working/"${UNZIP_DIR}"/all_files.txt
 
 if [[ -n $GIT_OAUTH_TOKEN ]]; then
-    GITPUSH=(git push https://"$GIT_OAUTH_TOKEN"@gitlab.com/$ORG/"${repo,,}".git "$branch")
-    curl --silent --fail "" 2> /dev/null && echo "Firmware already dumped!" && exit 1
+    GITPUSH=(git push https://"$GIT_OAUTH_TOKEN"@github.com/$ORG/"${repo,,}".git "$branch")
+    curl --silent --fail "https://raw.githubusercontent.com/$ORG/$repo/$branch/all_files.txt" 2> /dev/null && echo "Firmware already dumped!" && exit 1
     git init
     if [[ -z "$(git config --get user.email)" ]]; then
-        git config user.email AndroidDumps@gitlab.com
+        git config user.email AndroidDumps@github.com
     fi
     if [[ -z "$(git config --get user.name)" ]]; then
         git config user.name AndroidDumps
     fi
-    curl -s -X POST -H "Authorization: Bearer ${GIT_OAUTH_TOKEN}" -d '{ "name": "'"$repo"'" }' "https://gitlab.com/api/v4/projects?namespace=$ORG" # 在 GitLab 上创建新仓库
-    curl -s -X PUT -H "Authorization: Bearer ${GIT_OAUTH_TOKEN}" -d '{ "names": ["'"$manufacturer"'","'"$platform"'","'"$top_codename"'"]}' "https://gitlab.com/api/v4/projects/$ORG/$repo/topics" # 设置项目话题
-    git remote add origin https://gitlab.com/$ORG/"${repo,,}".git
+    curl -s -X POST -H "Authorization: token ${GIT_OAUTH_TOKEN}" -d '{ "name": "'"$repo"'" }' "https://api.github.com/orgs/${ORG}/repos" #create new repo
+    curl -s -X PUT -H "Authorization: token ${GIT_OAUTH_TOKEN}" -H "Accept: application/vnd.github.mercy-preview+json" -d '{ "names": ["'"$manufacturer"'","'"$platform"'","'"$top_codename"'"]}' "https://api.github.com/repos/${ORG}/${repo}/topics"
+    git remote add origin https://github.com/$ORG/"${repo,,}".git
     git checkout -b "$branch"
     find . -size +97M -printf '%P\n' -o -name "*sensetime*" -printf '%P\n' -o -name "*.lic" -printf '%P\n' >| .gitignore
     git add --all
