@@ -362,7 +362,7 @@ find "$PROJECT_DIR"/working/"${UNZIP_DIR}" -type f -printf '%P\n' | sort | grep 
 
 if [[ -n $GIT_OAUTH_TOKEN ]]; then
     GITPUSH=(git push https://gitlab-ci-token:"$GIT_OAUTH_TOKEN"@gitlab.com/$ORG/"${repo,,}".git "$branch")
-    curl --silent --fail "" 2> /dev/null && echo "Firmware already dumped!" && exit 1
+    curl --silent --fail "https://gitlab.com/api/v4/projects/$ORG%2F${repo,,}/repository/files/path%2Fto%2Ffirmware%2Ffile/raw" 2> /dev/null && echo "Firmware already dumped!" && exit 1
     git init
     if [[ -z "$(git config --get user.email)" ]]; then
         git config user.email 22097791+xiaoka6666@users.noreply.gitlab.com
